@@ -7,6 +7,21 @@ import {
   getCompletedTasks,
   getUncompletedTasks,
 } from "~/services/tasks.service";
+import type { User } from "~/interfaces/user.interface";
+import { getUsersWithTasks } from "~/services/users.service";
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from "~/components/ui/combobox";
+import {
+  FilteredDataProvider,
+  UncompletedTasksSortBy,
+  useFilteredData,
+} from "./helpers/filtered-data-provider";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -19,22 +34,38 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-export default function Index() {
-  const [completedTasks, setCompletedTasks] = useState<Task[]>([]);
-  const [uncompletedTasks, setUncompletedTasks] = useState<Task[]>([]);
+function Index() {
+  const {
+    completedTasks,
+    uncompletedTasks,
+    users,
+    setCompletedTasks,
+    setUncompletedTasks,
+    setUsers,
+    filteredByUserId,
+    setFilteredByUserId,
+    uncompletedTasksSortedBy,
+    setUncompletedTasksSortedBy,
+    completedTasksSortedBy,
+    setCompletedTasksSortedBy,
+    getUncompletedTasksSortByLabels,
+    getCompletedTasksSortByLabels,
+  } = useFilteredData();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchTasks = async () => {
+    const fetchInitialData = async () => {
       setLoading(true);
       setError(null);
 
       try {
-        const [completedResult, uncompletedResult] = await Promise.allSettled([
-          getCompletedTasks(),
-          getUncompletedTasks(),
-        ]);
+        const [completedResult, uncompletedResult, usersResult] =
+          await Promise.allSettled([
+            getCompletedTasks(),
+            getUncompletedTasks(),
+            getUsersWithTasks(),
+          ]);
 
         if (completedResult.status === "fulfilled") {
           setCompletedTasks(completedResult.value);
@@ -47,6 +78,12 @@ export default function Index() {
         } else {
           setError("Failed to fetch uncompleted tasks.");
         }
+
+        if (usersResult.status === "fulfilled") {
+          setUsers(usersResult.value);
+        } else {
+          setError("Failed to fetch users.");
+        }
       } catch (err) {
         setError("Failed to fetch tasks.");
       } finally {
@@ -54,7 +91,7 @@ export default function Index() {
       }
     };
 
-    fetchTasks();
+    fetchInitialData();
   }, []);
 
   const completeTask = (taskId: number) => {
@@ -72,15 +109,112 @@ export default function Index() {
     }
   };
 
+  const uncompleteTask = (taskId: number) => {
+    setCompletedTasks((prev) => prev.filter((task) => task.id !== taskId));
+    const uncompletedTask = completedTasks.find((task) => task.id === taskId);
+    if (uncompletedTask) {
+      setUncompletedTasks((prev) => [
+        ...prev,
+        {
+          ...uncompletedTask,
+          completed: false,
+          completedAt: undefined,
+        },
+      ]);
+    }
+  };
+
   return (
     <div className="relative w-full h-full flex gap-5 p-5">
+      <Combobox
+        items={users.map((user) => [user.id, user.username])}
+        onValueChange={(e) => setFilteredByUserId(e ? Number(e) : null)}
+        value={filteredByUserId}
+      >
+        <ComboboxInput
+          placeholder="Select user"
+          size={10}
+          value={
+            users.find((user) => user.id === filteredByUserId)?.username || ""
+          }
+        />
+        <ComboboxContent align="center">
+          <ComboboxEmpty>No items found.</ComboboxEmpty>
+          <ComboboxList>
+            {([key, label]) => (
+              <ComboboxItem key={key} value={key}>
+                {label}
+              </ComboboxItem>
+            )}
+          </ComboboxList>
+        </ComboboxContent>
+      </Combobox>
+      <Combobox
+        items={Object.entries(getUncompletedTasksSortByLabels())}
+        defaultValue={uncompletedTasksSortedBy}
+        onValueChange={(e) =>
+          setUncompletedTasksSortedBy(e as UncompletedTasksSortBy)
+        }
+      >
+        <ComboboxInput
+          placeholder="Select sort order"
+          value={getUncompletedTasksSortByLabels()[uncompletedTasksSortedBy]}
+          size={10}
+        />
+        <ComboboxContent align="center">
+          <ComboboxEmpty>No items found.</ComboboxEmpty>
+          <ComboboxList>
+            {([key, label]) => (
+              <ComboboxItem key={key} value={key}>
+                {label}
+              </ComboboxItem>
+            )}
+          </ComboboxList>
+        </ComboboxContent>
+      </Combobox>
+      <Combobox
+        items={Object.entries(getCompletedTasksSortByLabels())}
+        defaultValue={completedTasksSortedBy}
+        onValueChange={(e) =>
+          setCompletedTasksSortedBy(e as CompletedTasksSortBy)
+        }
+      >
+        <ComboboxInput
+          placeholder="Select sort order"
+          value={getCompletedTasksSortByLabels()[completedTasksSortedBy]}
+          size={10}
+        />
+        <ComboboxContent align="center">
+          <ComboboxEmpty>No items found.</ComboboxEmpty>
+          <ComboboxList>
+            {([key, label]) => (
+              <ComboboxItem key={key} value={key}>
+                {label}
+              </ComboboxItem>
+            )}
+          </ComboboxList>
+        </ComboboxContent>
+      </Combobox>
       <UncompletedTasks
         tasks={uncompletedTasks}
         loading={loading}
         error={error}
         completeTask={completeTask}
       />
-      <CompletedTasks tasks={completedTasks} loading={loading} error={error} />
+      <CompletedTasks
+        tasks={completedTasks}
+        loading={loading}
+        error={error}
+        uncompleteTask={uncompleteTask}
+      />
     </div>
+  );
+}
+
+export default function IndexWrapper() {
+  return (
+    <FilteredDataProvider>
+      <Index />
+    </FilteredDataProvider>
   );
 }

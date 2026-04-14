@@ -16,3 +16,11 @@ export async function getCompletedTasks(): Promise<Task[]> {
 
   return result;
 }
+
+export async function getTasks(): Promise<Task[]> {
+  const result = await request.get<Task[]>(
+    "https://jsonplaceholder.typicode.com/todos",
+  );
+
+  return result;
+}
