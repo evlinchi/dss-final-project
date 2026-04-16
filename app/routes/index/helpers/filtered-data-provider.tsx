@@ -43,6 +43,22 @@ interface FilteredDataProviderProps {
 
   getUncompletedTasksSortByLabels: () => Record<UncompletedTasksSortBy, string>;
   getCompletedTasksSortByLabels: () => Record<CompletedTasksSortBy, string>;
+
+  // Pagination for uncompleted tasks
+  uncompletedTasksCurrentPage: number;
+  setUncompletedTasksCurrentPage: (page: number) => void;
+  uncompletedTasksPageSize: number;
+  setUncompletedTasksPageSize: (size: number) => void;
+  paginatedUncompletedTasks: Task[];
+  uncompletedTasksTotalPages: number;
+
+  // Pagination for completed tasks
+  completedTasksCurrentPage: number;
+  setCompletedTasksCurrentPage: (page: number) => void;
+  completedTasksPageSize: number;
+  setCompletedTasksPageSize: (size: number) => void;
+  paginatedCompletedTasks: Task[];
+  completedTasksTotalPages: number;
 }
 
 const FilteredDataContext = createContext<
@@ -66,6 +82,21 @@ const FilteredDataProvider = ({ children }: { children: React.ReactNode }) => {
     useState<UncompletedTasksSortBy>(UncompletedTasksSortBy.TITLE_ASC);
   const [completedTasksSortedBy, setCompletedTasksSortedBy] =
     useState<CompletedTasksSortBy>(CompletedTasksSortBy.COMPLETED_AT_DESC);
+
+  // Pagination states
+  const [uncompletedTasksCurrentPage, setUncompletedTasksCurrentPage] =
+    useState(1);
+  const [uncompletedTasksPageSize, setUncompletedTasksPageSize] = useState(10);
+  const [completedTasksCurrentPage, setCompletedTasksCurrentPage] = useState(1);
+  const [completedTasksPageSize, setCompletedTasksPageSize] = useState(10);
+
+  // Paginated results
+  const [paginatedUncompletedTasks, setPaginatedUncompletedTasks] = useState<
+    Task[]
+  >([]);
+  const [paginatedCompletedTasks, setPaginatedCompletedTasks] = useState<
+    Task[]
+  >([]);
 
   const setCompletedTasksCustom: React.Dispatch<
     React.SetStateAction<Task[]>
@@ -136,7 +167,57 @@ const FilteredDataProvider = ({ children }: { children: React.ReactNode }) => {
 
     setCompletedTasks(filteredCompleted);
     setUncompletedTasks(filteredUncompleted);
-  }, [filteredByUserId, uncompletedTasksSortedBy, completedTasksSortedBy]);
+
+    // Reset pages when filters or sorting change
+    setUncompletedTasksCurrentPage(1);
+    setCompletedTasksCurrentPage(1);
+  }, [
+    filteredByUserId,
+    uncompletedTasksSortedBy,
+    completedTasksSortedBy,
+    initialCompletedTasks,
+    initialUncompletedTasks,
+  ]);
+
+  // Pagination effect
+  useEffect(() => {
+    const startUncompleted =
+      (uncompletedTasksCurrentPage - 1) * uncompletedTasksPageSize;
+    const endUncompleted = startUncompleted + uncompletedTasksPageSize;
+    setPaginatedUncompletedTasks(
+      uncompletedTasks.slice(startUncompleted, endUncompleted),
+    );
+  }, [uncompletedTasks, uncompletedTasksCurrentPage, uncompletedTasksPageSize]);
+
+  useEffect(() => {
+    const startCompleted =
+      (completedTasksCurrentPage - 1) * completedTasksPageSize;
+    const endCompleted = startCompleted + completedTasksPageSize;
+    setPaginatedCompletedTasks(
+      completedTasks.slice(startCompleted, endCompleted),
+    );
+  }, [completedTasks, completedTasksCurrentPage, completedTasksPageSize]);
+
+  const uncompletedTasksTotalPages = Math.max(
+    1,
+    Math.ceil(uncompletedTasks.length / uncompletedTasksPageSize),
+  );
+  const completedTasksTotalPages = Math.max(
+    1,
+    Math.ceil(completedTasks.length / completedTasksPageSize),
+  );
+
+  useEffect(() => {
+    if (uncompletedTasksCurrentPage > uncompletedTasksTotalPages) {
+      setUncompletedTasksCurrentPage(Math.max(1, uncompletedTasksTotalPages));
+    }
+  }, [uncompletedTasksTotalPages, uncompletedTasksCurrentPage]);
+
+  useEffect(() => {
+    if (completedTasksCurrentPage > completedTasksTotalPages) {
+      setCompletedTasksCurrentPage(Math.max(1, completedTasksTotalPages));
+    }
+  }, [completedTasksTotalPages, completedTasksCurrentPage]);
 
   const getUncompletedTasksSortByLabels = () => {
     return UNCOMPLETED_TASKS_SORT_BY_LABELS;
@@ -163,6 +244,18 @@ const FilteredDataProvider = ({ children }: { children: React.ReactNode }) => {
         setCompletedTasksSortedBy,
         getUncompletedTasksSortByLabels,
         getCompletedTasksSortByLabels,
+        uncompletedTasksCurrentPage,
+        setUncompletedTasksCurrentPage,
+        uncompletedTasksPageSize,
+        setUncompletedTasksPageSize,
+        paginatedUncompletedTasks,
+        uncompletedTasksTotalPages,
+        completedTasksCurrentPage,
+        setCompletedTasksCurrentPage,
+        completedTasksPageSize,
+        setCompletedTasksPageSize,
+        paginatedCompletedTasks,
+        completedTasksTotalPages,
       }}
     >
       {children}

@@ -1,38 +1,110 @@
-import { Button } from "~/components/ui/button";
-import type { Task } from "~/interfaces/task.interface";
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from "~/components/ui/combobox";
+import { CheckCircle2Icon } from "lucide-react";
+import TaskPanelCard from "./task-panel-card";
+import {
+  UncompletedTasksSortBy,
+  useFilteredData,
+} from "../helpers/filtered-data-provider";
 
 export default function UncompletedTasks({
-  tasks,
   loading,
   error,
   completeTask,
 }: {
-  tasks: Task[];
   loading: boolean;
   error: string | null;
   completeTask: (taskId: number) => void;
 }) {
+  const {
+    users,
+    filteredByUserId,
+    setFilteredByUserId,
+    uncompletedTasksSortedBy,
+    setUncompletedTasksSortedBy,
+    getUncompletedTasksSortByLabels,
+    uncompletedTasksPageSize,
+    setUncompletedTasksPageSize,
+    paginatedUncompletedTasks,
+    uncompletedTasksCurrentPage,
+    setUncompletedTasksCurrentPage,
+    uncompletedTasksTotalPages,
+  } = useFilteredData();
+
+  const headerControls = (
+    <>
+      <Combobox
+        items={users.map((user) => [user.id, user.username])}
+        onValueChange={(value) =>
+          setFilteredByUserId(value ? Number(value) : null)
+        }
+        value={filteredByUserId}
+      >
+        <ComboboxInput
+          placeholder="Select user"
+          size={10}
+          value={
+            users.find((user) => user.id === filteredByUserId)?.username || ""
+          }
+        />
+        <ComboboxContent align="center">
+          <ComboboxEmpty>No items found.</ComboboxEmpty>
+          <ComboboxList>
+            {([key, label]) => (
+              <ComboboxItem key={key} value={key}>
+                {label}
+              </ComboboxItem>
+            )}
+          </ComboboxList>
+        </ComboboxContent>
+      </Combobox>
+      <Combobox
+        items={Object.entries(getUncompletedTasksSortByLabels())}
+        defaultValue={uncompletedTasksSortedBy}
+        onValueChange={(value) =>
+          setUncompletedTasksSortedBy(value as UncompletedTasksSortBy)
+        }
+      >
+        <ComboboxInput
+          placeholder="Sort by"
+          value={getUncompletedTasksSortByLabels()[uncompletedTasksSortedBy]}
+          size={10}
+        />
+        <ComboboxContent align="center">
+          <ComboboxEmpty>No items found.</ComboboxEmpty>
+          <ComboboxList>
+            {([key, label]) => (
+              <ComboboxItem key={key} value={key}>
+                {label}
+              </ComboboxItem>
+            )}
+          </ComboboxList>
+        </ComboboxContent>
+      </Combobox>
+    </>
+  );
+
   return (
-    <div className="relative w-full h-full bg-blue-500">
-      <h1>Uncompleted Tasks</h1>
-      {loading && "Loading..."}
-      {error && <div className="text-red-500">{error}</div>}
-      {!loading && !error && (
-        <ul>
-          {tasks.map((task) => (
-            <>
-              <li key={task.id}>{task.title}</li>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => completeTask(task.id)}
-              >
-                Mark as Completed
-              </Button>
-            </>
-          ))}
-        </ul>
-      )}
-    </div>
+    <TaskPanelCard
+      title="Uncompleted Tasks"
+      loading={loading}
+      error={error}
+      tasks={paginatedUncompletedTasks}
+      actionIcon={<CheckCircle2Icon className="size-4" />}
+      onTaskAction={completeTask}
+      pageSize={uncompletedTasksPageSize}
+      onPageSizeChange={setUncompletedTasksPageSize}
+      currentPage={uncompletedTasksCurrentPage}
+      onPageChange={setUncompletedTasksCurrentPage}
+      totalPages={uncompletedTasksTotalPages}
+      headerControls={headerControls}
+      noTasksMessage="No uncompleted tasks remaining."
+    />
   );
 }

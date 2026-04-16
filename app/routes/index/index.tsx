@@ -38,18 +38,9 @@ function Index() {
   const {
     completedTasks,
     uncompletedTasks,
-    users,
     setCompletedTasks,
     setUncompletedTasks,
     setUsers,
-    filteredByUserId,
-    setFilteredByUserId,
-    uncompletedTasksSortedBy,
-    setUncompletedTasksSortedBy,
-    completedTasksSortedBy,
-    setCompletedTasksSortedBy,
-    getUncompletedTasksSortByLabels,
-    getCompletedTasksSortByLabels,
   } = useFilteredData();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -125,84 +116,13 @@ function Index() {
   };
 
   return (
-    <div className="relative w-full h-full flex gap-5 p-5">
-      <Combobox
-        items={users.map((user) => [user.id, user.username])}
-        onValueChange={(e) => setFilteredByUserId(e ? Number(e) : null)}
-        value={filteredByUserId}
-      >
-        <ComboboxInput
-          placeholder="Select user"
-          size={10}
-          value={
-            users.find((user) => user.id === filteredByUserId)?.username || ""
-          }
-        />
-        <ComboboxContent align="center">
-          <ComboboxEmpty>No items found.</ComboboxEmpty>
-          <ComboboxList>
-            {([key, label]) => (
-              <ComboboxItem key={key} value={key}>
-                {label}
-              </ComboboxItem>
-            )}
-          </ComboboxList>
-        </ComboboxContent>
-      </Combobox>
-      <Combobox
-        items={Object.entries(getUncompletedTasksSortByLabels())}
-        defaultValue={uncompletedTasksSortedBy}
-        onValueChange={(e) =>
-          setUncompletedTasksSortedBy(e as UncompletedTasksSortBy)
-        }
-      >
-        <ComboboxInput
-          placeholder="Select sort order"
-          value={getUncompletedTasksSortByLabels()[uncompletedTasksSortedBy]}
-          size={10}
-        />
-        <ComboboxContent align="center">
-          <ComboboxEmpty>No items found.</ComboboxEmpty>
-          <ComboboxList>
-            {([key, label]) => (
-              <ComboboxItem key={key} value={key}>
-                {label}
-              </ComboboxItem>
-            )}
-          </ComboboxList>
-        </ComboboxContent>
-      </Combobox>
-      <Combobox
-        items={Object.entries(getCompletedTasksSortByLabels())}
-        defaultValue={completedTasksSortedBy}
-        onValueChange={(e) =>
-          setCompletedTasksSortedBy(e as CompletedTasksSortBy)
-        }
-      >
-        <ComboboxInput
-          placeholder="Select sort order"
-          value={getCompletedTasksSortByLabels()[completedTasksSortedBy]}
-          size={10}
-        />
-        <ComboboxContent align="center">
-          <ComboboxEmpty>No items found.</ComboboxEmpty>
-          <ComboboxList>
-            {([key, label]) => (
-              <ComboboxItem key={key} value={key}>
-                {label}
-              </ComboboxItem>
-            )}
-          </ComboboxList>
-        </ComboboxContent>
-      </Combobox>
+    <div className="relative w-full flex-1 min-h-0 flex flex-col lg:flex-row gap-3 sm:gap-4 mt-3 sm:mt-4">
       <UncompletedTasks
-        tasks={uncompletedTasks}
         loading={loading}
         error={error}
         completeTask={completeTask}
       />
       <CompletedTasks
-        tasks={completedTasks}
         loading={loading}
         error={error}
         uncompleteTask={uncompleteTask}

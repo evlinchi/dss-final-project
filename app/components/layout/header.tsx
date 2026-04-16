@@ -13,7 +13,7 @@ export default function Header() {
   const { theme, setTheme, getAllAvailableThemes } = useTheme();
 
   return (
-    <header className="relative px-5 py-3 flex justify-between items-center h-auto w-full">
+    <header className="relative px-5 py-3 border border-border box-border flex justify-between items-center h-auto w-full bg-secondary rounded-xl">
       <img src="/images/logo.png" className="w-40" />
       <div className="flex items-center gap-4">
         <span className="font-heading italic">Clear tasks. Clear mind.</span>

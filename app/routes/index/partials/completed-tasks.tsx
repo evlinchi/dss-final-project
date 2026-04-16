@@ -1,41 +1,81 @@
-import { Button } from "~/components/ui/button";
-import type { Task } from "~/interfaces/task.interface";
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from "~/components/ui/combobox";
+import { RotateCcwIcon } from "lucide-react";
+import TaskPanelCard from "./task-panel-card";
+import {
+  CompletedTasksSortBy,
+  useFilteredData,
+} from "../helpers/filtered-data-provider";
 
 export default function CompletedTasks({
-  tasks,
   loading,
   error,
   uncompleteTask,
 }: {
-  tasks: Task[];
   loading: boolean;
   error: string | null;
   uncompleteTask: (taskId: number) => void;
 }) {
+  const {
+    completedTasksSortedBy,
+    setCompletedTasksSortedBy,
+    getCompletedTasksSortByLabels,
+    completedTasksPageSize,
+    setCompletedTasksPageSize,
+    paginatedCompletedTasks,
+    completedTasksCurrentPage,
+    setCompletedTasksCurrentPage,
+    completedTasksTotalPages,
+  } = useFilteredData();
+
+  const headerControls = (
+    <Combobox
+      items={Object.entries(getCompletedTasksSortByLabels())}
+      defaultValue={completedTasksSortedBy}
+      onValueChange={(value) =>
+        setCompletedTasksSortedBy(value as CompletedTasksSortBy)
+      }
+    >
+      <ComboboxInput
+        placeholder="Sort by"
+        value={getCompletedTasksSortByLabels()[completedTasksSortedBy]}
+        size={21}
+      />
+      <ComboboxContent align="center">
+        <ComboboxEmpty>No items found.</ComboboxEmpty>
+        <ComboboxList>
+          {([key, label]) => (
+            <ComboboxItem key={key} value={key}>
+              {label}
+            </ComboboxItem>
+          )}
+        </ComboboxList>
+      </ComboboxContent>
+    </Combobox>
+  );
+
   return (
-    <div className="relative w-full h-full bg-green-500">
-      <h1>Completed Tasks</h1>
-      {loading && "Loading..."}
-      {error && <div className="text-red-500">{error}</div>}
-      {!loading && !error && (
-        <ul>
-          {tasks.map((task) => (
-            <>
-              <li key={task.id}>{task.title}</li>
-              {task.completedAt && (
-                <li>{new Date(task.completedAt).toLocaleDateString()}</li>
-              )}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => uncompleteTask(task.id)}
-              >
-                Mark as Uncompleted
-              </Button>
-            </>
-          ))}
-        </ul>
-      )}
-    </div>
+    <TaskPanelCard
+      title="Completed Tasks"
+      loading={loading}
+      error={error}
+      tasks={paginatedCompletedTasks}
+      actionIcon={<RotateCcwIcon className="size-4" />}
+      onTaskAction={uncompleteTask}
+      showCompletedAt
+      pageSize={completedTasksPageSize}
+      onPageSizeChange={setCompletedTasksPageSize}
+      currentPage={completedTasksCurrentPage}
+      onPageChange={setCompletedTasksCurrentPage}
+      totalPages={completedTasksTotalPages}
+      headerControls={headerControls}
+      noTasksMessage="There are no completed tasks yet."
+    />
   );
 }
