@@ -1,63 +1,43 @@
 import { useEffect, createContext, useState } from "react";
 
 enum Theme {
-  Light = "light",
-  Dark = "dark",
+  Y2K = "y2k",
+  Oceanic = "oceanic",
+  ModernDark = "modern-dark",
+  Beige = "beige",
 }
 
-const THEME_LABELS: Record<Theme, string> = {
-  [Theme.Light]: "Light Mode ☀️",
-  [Theme.Dark]: "Dark Mode 🌙",
-};
+const THEME_VALUES = Object.values(Theme);
 
 interface ThemeContextType {
   theme: Theme;
   setTheme: (theme: Theme) => void;
-  toggleTheme: () => void;
-  getAllAvailableThemes: () => Record<Theme, string>;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [theme, setTheme] = useState<Theme>(Theme.Dark);
+const STORAGE_KEY = "theme";
+const DEFAULT: Theme = Theme.Oceanic;
 
-  // Load theme from localStorage on client mount
+const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
+  const [theme, setTheme] = useState<Theme>(DEFAULT);
+
   useEffect(() => {
-    const storedTheme = localStorage.getItem("theme") as Theme | null;
-    if (storedTheme && Object.values(Theme).includes(storedTheme)) {
-      setTheme(storedTheme);
+    const stored = localStorage.getItem(STORAGE_KEY) as Theme | null;
+    if (stored && THEME_VALUES.includes(stored)) {
+      setTheme(stored);
     } else {
-      localStorage.setItem("theme", Theme.Dark);
-      setTheme(Theme.Dark);
+      localStorage.setItem(STORAGE_KEY, DEFAULT);
+      setTheme(DEFAULT);
     }
   }, []);
 
-  function toggleTheme() {
-    if (theme === Theme.Dark) {
-      setTheme(Theme.Light);
-    } else {
-      setTheme(Theme.Dark);
-    }
-  }
-
-  function getAllAvailableThemes(): Record<Theme, string> {
-    return THEME_LABELS;
-  }
-
   useEffect(() => {
-    localStorage.setItem("theme", theme);
+    localStorage.setItem(STORAGE_KEY, theme);
   }, [theme]);
 
   return (
-    <ThemeContext.Provider
-      value={{
-        theme,
-        setTheme,
-        toggleTheme,
-        getAllAvailableThemes,
-      }}
-    >
+    <ThemeContext.Provider value={{ theme, setTheme }}>
       {children}
     </ThemeContext.Provider>
   );

@@ -1,0 +1,123 @@
+/* ---------------------------------------------------------
+ * Theme flourish utilities.
+ *
+ * These classes are safe to use in any theme; per-theme
+ * overrides below add the decorative treatments that make
+ * each theme feel distinct (glass, gloss, paper, etc.).
+ * ------------------------------------------------------- */
+
+@layer components {
+  /* Glass surface — frosted translucent panel */
+  .glass {
+    background-color: var(--card);
+    border: 1px solid var(--border);
+  }
+
+  /* Glossy surface — reflective highlight panel */
+  .glossy {
+    background-color: var(--card);
+    border: 1px solid var(--border);
+  }
+
+  /* Paper surface — warm tactile panel */
+  .paper {
+    background-color: var(--card);
+    border: 1px solid var(--border);
+  }
+
+  /* Gradient helpers — used for button CTAs and hero panels */
+  .gradient-surface {
+    background-image: var(--gradient-surface);
+  }
+  .gradient-primary {
+    background-image: var(--gradient-primary);
+  }
+  .gradient-accent {
+    background-image: var(--gradient-accent);
+  }
+
+  /* Themed glow ring (composes with tailwind focus-visible utilities) */
+  .glow-ring:focus-visible {
+    outline: none;
+    box-shadow: var(--ring-glow);
+  }
+
+  /* Destructive alert block */
+  .alert-destructive {
+    background-color: color-mix(in oklch, var(--destructive) 12%, transparent);
+    border: 1px solid color-mix(in oklch, var(--destructive) 35%, transparent);
+    color: var(--destructive);
+  }
+}
+
+/* ---------------- Y2K overrides ---------------- */
+[data-theme="y2k"] .glass {
+  background-color: var(--surface-glass);
+  backdrop-filter: blur(10px) saturate(1.3);
+  -webkit-backdrop-filter: blur(10px) saturate(1.3);
+  border: 1px solid oklch(1 0 0 / 0.7);
+}
+
+[data-theme="y2k"] .glossy {
+  background-image: var(--gradient-primary);
+  background-size: 100% 200%;
+  background-position: 0% 0%;
+  box-shadow:
+    inset 0 1px 0 oklch(1 0 0 / 0.7),
+    inset 0 -2px 4px oklch(0.45 0.2 350 / 0.3),
+    0 4px 14px oklch(0.7 0.25 350 / 0.35);
+  color: var(--primary-foreground);
+  transition:
+    background-position 0.6s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-theme="y2k"] .glossy:hover {
+    background-position: 0% 60%;
+  }
+}
+
+/* ---------------- Oceanic overrides ---------------- */
+[data-theme="oceanic"] .glass {
+  background-color: var(--surface-glass);
+  backdrop-filter: blur(12px) saturate(1.1);
+  -webkit-backdrop-filter: blur(12px) saturate(1.1);
+  border: 1px solid oklch(0.5 0.1 210 / 0.45);
+}
+
+[data-theme="oceanic"] .glossy {
+  background-image: var(--gradient-primary);
+  box-shadow:
+    inset 0 1px 0 oklch(1 0 0 / 0.25),
+    0 6px 22px oklch(0.55 0.2 215 / 0.35);
+  color: var(--primary-foreground);
+}
+
+/* ---------------- Modern Dark overrides ---------------- */
+[data-theme="modern-dark"] .glass,
+[data-theme="modern-dark"] .glossy {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ---------------- Beige overrides ---------------- */
+[data-theme="beige"] .glass,
+[data-theme="beige"] .paper {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  background-image: linear-gradient(
+    115deg,
+    oklch(0.4 0.04 60 / 0.015) 0%,
+    transparent 50%,
+    oklch(0.4 0.04 60 / 0.02) 100%
+  );
+}
+
+[data-theme="beige"] .glossy {
+  background-image: var(--gradient-primary);
+  color: var(--primary-foreground);
+  box-shadow: var(--shadow-md);
+}

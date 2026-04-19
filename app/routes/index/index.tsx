@@ -116,7 +116,7 @@ function Index() {
   };
 
   return (
-    <div className="relative w-full flex-1 min-h-0 flex flex-col lg:flex-row gap-3 sm:gap-4 mt-3 sm:mt-4">
+    <div className="relative w-full flex-1 min-h-0 flex flex-col lg:flex-row gap-3 sm:gap-4 mt-4 sm:mt-4">
       <UncompletedTasks
         loading={loading}
         error={error}

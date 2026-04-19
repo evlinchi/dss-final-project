@@ -26,8 +26,6 @@ export default function CompletedTasks({
     completedTasksSortedBy,
     setCompletedTasksSortedBy,
     getCompletedTasksSortByLabels,
-    completedTasksPageSize,
-    setCompletedTasksPageSize,
     paginatedCompletedTasks,
     completedTasksCurrentPage,
     setCompletedTasksCurrentPage,
@@ -43,11 +41,12 @@ export default function CompletedTasks({
       }
     >
       <ComboboxInput
-        placeholder="Sort by"
+        placeholder="Sort by date"
         value={getCompletedTasksSortByLabels()[completedTasksSortedBy]}
-        size={21}
+        size={10}
+        labelBackgroundClassName="bg-card"
       />
-      <ComboboxContent align="center">
+      <ComboboxContent align="start">
         <ComboboxEmpty>No items found.</ComboboxEmpty>
         <ComboboxList>
           {([key, label]) => (
@@ -69,8 +68,6 @@ export default function CompletedTasks({
       actionIcon={<RotateCcwIcon className="size-4" />}
       onTaskAction={uncompleteTask}
       showCompletedAt
-      pageSize={completedTasksPageSize}
-      onPageSizeChange={setCompletedTasksPageSize}
       currentPage={completedTasksCurrentPage}
       onPageChange={setCompletedTasksCurrentPage}
       totalPages={completedTasksTotalPages}

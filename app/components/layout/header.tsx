@@ -1,43 +1,14 @@
-import { useTheme } from "~/lib/use-theme";
-import { Theme } from "~/lib/theme-provider";
-import {
-  Combobox,
-  ComboboxContent,
-  ComboboxEmpty,
-  ComboboxInput,
-  ComboboxItem,
-  ComboboxList,
-} from "../ui/combobox";
+import ThemeSwitcher from "../ui/theme-switcher";
 
 export default function Header() {
-  const { theme, setTheme, getAllAvailableThemes } = useTheme();
-
   return (
-    <header className="relative px-5 py-3 border border-border box-border flex justify-between items-center h-auto w-full bg-secondary rounded-xl">
-      <img src="/images/logo.png" className="w-40" />
-      <div className="flex items-center gap-4">
-        <span className="font-heading italic">Clear tasks. Clear mind.</span>
-        <Combobox
-          items={Object.entries(getAllAvailableThemes())}
-          defaultValue={theme}
-          onValueChange={(e) => setTheme(e as Theme)}
-        >
-          <ComboboxInput
-            placeholder="Select theme"
-            value={getAllAvailableThemes()[theme]}
-            size={10}
-          />
-          <ComboboxContent align="center">
-            <ComboboxEmpty>No items found.</ComboboxEmpty>
-            <ComboboxList>
-              {([key, label]) => (
-                <ComboboxItem key={key} value={key}>
-                  {label}
-                </ComboboxItem>
-              )}
-            </ComboboxList>
-          </ComboboxContent>
-        </Combobox>
+    <header className="glass relative z-10 px-4 py-3 sm:px-5 box-border flex justify-between items-center gap-4 h-auto w-full rounded-2xl">
+      <img src="/images/logo.png" className="w-32 sm:w-40" alt="Taskly" />
+      <div className="flex items-center gap-3 sm:gap-5">
+        <span className="hidden sm:inline font-heading italic text-muted-foreground text-sm">
+          Clear tasks. Clear mind.
+        </span>
+        <ThemeSwitcher />
       </div>
     </header>
   );

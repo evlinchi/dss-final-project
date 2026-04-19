@@ -1,0 +1,79 @@
+@import "@fontsource-variable/fraunces";
+
+[data-theme="beige"] {
+  /* Surfaces */
+  --background: oklch(0.96 0.018 85);
+  --foreground: oklch(0.3 0.03 60);
+  --card: oklch(0.98 0.014 85);
+  --card-foreground: oklch(0.3 0.03 60);
+  --elevated: oklch(0.99 0.01 85);
+  --elevated-foreground: oklch(0.3 0.03 60);
+  --surface-glass: oklch(0.98 0.014 85 / 0.8);
+  --popover: oklch(0.98 0.014 85);
+  --popover-foreground: oklch(0.3 0.03 60);
+  --muted: oklch(0.93 0.02 80);
+  --muted-foreground: oklch(0.5 0.03 65);
+  --border: oklch(0.84 0.028 75);
+  --input: oklch(0.94 0.02 80);
+  --ring: oklch(0.58 0.1 55);
+
+  /* Intents */
+  --primary: oklch(0.48 0.11 55);
+  --primary-foreground: oklch(0.98 0.015 85);
+  --secondary: oklch(0.9 0.028 80);
+  --secondary-foreground: oklch(0.32 0.04 60);
+  --accent: oklch(0.74 0.07 30);
+  --accent-foreground: oklch(0.28 0.06 35);
+  --destructive: oklch(0.52 0.18 25);
+  --destructive-foreground: oklch(0.98 0.02 25);
+  --success: oklch(0.58 0.1 135);
+  --success-foreground: oklch(0.98 0.02 135);
+  --warning: oklch(0.72 0.13 75);
+  --warning-foreground: oklch(0.25 0.08 75);
+
+  /* Task semantics */
+  --task-complete: oklch(0.58 0.1 135);
+  --task-complete-foreground: oklch(0.98 0.02 135);
+  --task-active: oklch(0.48 0.11 55);
+  --task-action-hover: oklch(0.48 0.11 55);
+
+  /* Elevation — warm and short */
+  --shadow-sm: 0 1px 2px oklch(0.4 0.04 60 / 0.08);
+  --shadow-md: 0 4px 12px oklch(0.4 0.04 60 / 0.1), 0 1px 3px oklch(0.4 0.04 60 / 0.06);
+  --shadow-lg: 0 12px 30px oklch(0.4 0.04 60 / 0.12), 0 4px 8px oklch(0.4 0.04 60 / 0.08);
+  --shadow-glow: 0 0 22px oklch(0.7 0.09 55 / 0.3);
+  --ring-glow: 0 0 0 3px oklch(0.58 0.1 55 / 0.35);
+
+  /* Gradients */
+  --gradient-surface: linear-gradient(180deg, oklch(0.97 0.018 85) 0%, oklch(0.95 0.024 80) 100%);
+  --gradient-primary: linear-gradient(180deg, oklch(0.56 0.1 55) 0%, oklch(0.42 0.12 50) 100%);
+  --gradient-accent: linear-gradient(135deg, oklch(0.78 0.06 30) 0%, oklch(0.7 0.08 50) 100%);
+
+  /* Radius */
+  --radius: 0.5rem;
+
+  /* Typography */
+  --font-body: "Instrument Sans Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Fraunces Variable", ui-serif, Georgia, serif;
+  --font-mono-theme: "JetBrains Mono Variable", ui-monospace, monospace;
+
+  /* Scrollbar */
+  --scrollbar-thumb: oklch(0.8 0.03 70);
+  --scrollbar-thumb-hover: oklch(0.55 0.08 55);
+
+  /* Sidebar */
+  --sidebar: oklch(0.97 0.018 85);
+  --sidebar-foreground: oklch(0.3 0.03 60);
+  --sidebar-primary: oklch(0.48 0.11 55);
+  --sidebar-primary-foreground: oklch(0.98 0.015 85);
+  --sidebar-accent: oklch(0.9 0.028 80);
+  --sidebar-accent-foreground: oklch(0.32 0.04 60);
+  --sidebar-border: oklch(0.84 0.028 75);
+  --sidebar-ring: oklch(0.58 0.1 55);
+
+  --chart-1: oklch(0.5 0.1 55);
+  --chart-2: oklch(0.72 0.07 35);
+  --chart-3: oklch(0.58 0.1 135);
+  --chart-4: oklch(0.4 0.08 65);
+  --chart-5: oklch(0.8 0.04 80);
+}

@@ -55,34 +55,111 @@ function ComboboxInput({
   disabled = false,
   showTrigger = true,
   showClear = false,
+  placeholder,
+  value,
+  defaultValue,
+  onChange,
+  onFocus,
+  onBlur,
+  labelBackgroundClassName = "bg-background",
   ...props
 }: ComboboxPrimitive.Input.Props & {
   showTrigger?: boolean;
   showClear?: boolean;
+  labelBackgroundClassName?: string;
+  defaultValue?: string;
 }) {
+  const [focused, setFocused] = React.useState(false);
+  const [hasValue, setHasValue] = React.useState(
+    Boolean(value ?? defaultValue ?? ""),
+  );
+
+  React.useEffect(() => {
+    if (value !== undefined) {
+      setHasValue(Boolean(value));
+    }
+  }, [value]);
+
+  const shouldFloat = focused || hasValue;
+
   return (
-    <InputGroup className={cn("w-auto", className)}>
-      <ComboboxPrimitive.Input
-        render={<InputGroupInput disabled={disabled} />}
-        {...props}
-      />
-      <InputGroupAddon align="inline-end">
-        {showTrigger && (
-          <InputGroupButton
-            size="icon-xs"
-            variant="ghost"
-            asChild
-            data-slot="input-group-button"
-            className="group-has-data-[slot=combobox-clear]/input-group:hidden data-pressed:bg-transparent"
-            disabled={disabled}
-          >
-            <ComboboxTrigger />
-          </InputGroupButton>
+    <div className="relative w-auto">
+      <InputGroup
+        className={cn(
+          "relative w-auto transition-all duration-200",
+          focused && "scale-[1.01]",
+          className,
         )}
-        {showClear && <ComboboxClear disabled={disabled} />}
-      </InputGroupAddon>
-      {children}
-    </InputGroup>
+      >
+        {placeholder && (
+          <label
+            className={cn(
+              "pointer-events-none absolute left-3 z-10 origin-left font-medium",
+              "transition-all duration-200 ease-out",
+              shouldFloat
+                ? cn(
+                    "top-0 -translate-y-1/2 px-1.5 text-[10px] text-primary bg-card rounded-full border border-primary",
+                  )
+                : "top-1/2 -translate-y-1/2 px-0 text-sm text-muted-foreground/80",
+            )}
+          >
+            {placeholder}
+          </label>
+        )}
+
+        <ComboboxPrimitive.Input
+          render={
+            <InputGroupInput
+              disabled={disabled}
+              className={cn(
+                "transition-all duration-200 py-2.5",
+                shouldFloat && "pt-4 pb-3",
+                !shouldFloat && "py-2.5",
+              )}
+            />
+          }
+          value={value}
+          //@ts-expect-error - Radix types are wrong for this one
+          defaultValue={defaultValue}
+          onFocus={(e) => {
+            setFocused(true);
+            onFocus?.(e);
+          }}
+          onChange={(e) => {
+            setHasValue(!!e.currentTarget.value);
+            onChange?.(e);
+          }}
+          onBlur={(e) => {
+            setFocused(false);
+            setHasValue(!!e.currentTarget.value);
+            onBlur?.(e);
+          }}
+          {...props}
+        />
+
+        <InputGroupAddon align="inline-end">
+          {showTrigger && (
+            <InputGroupButton
+              size="icon-xs"
+              variant="ghost"
+              asChild
+              data-slot="input-group-button"
+              className={cn(
+                "transition-all duration-200",
+                "group-has-data-[slot=combobox-clear]/input-group:hidden data-pressed:bg-transparent",
+                focused && "text-primary",
+              )}
+              disabled={disabled}
+            >
+              <ComboboxTrigger />
+            </InputGroupButton>
+          )}
+          {showClear && <ComboboxClear disabled={disabled} />}
+        </InputGroupAddon>
+
+        {children}
+      </InputGroup>
+    </div>
   );
 }
 
@@ -90,7 +167,7 @@ function ComboboxContent({
   className,
   side = "bottom",
   sideOffset = 6,
-  align = "start",
+  align = "center",
   alignOffset = 0,
   anchor,
   ...props
@@ -113,7 +190,7 @@ function ComboboxContent({
           data-slot="combobox-content"
           data-chips={!!anchor}
           className={cn(
-            "group/combobox-content max-h-(--available-height) w-(--anchor-width) max-w-(--available-width) min-w-[calc(var(--anchor-width)+--spacing(7))] origin-(--transform-origin) overflow-hidden rounded-2xl text-popover-foreground shadow-2xl ring-1 ring-foreground/5 duration-100 data-[chips=true]:min-w-(--anchor-width) data-[side=bottom]:slide-in-from-top-2 data-[side=inline-end]:slide-in-from-left-2 data-[side=inline-start]:slide-in-from-right-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 *:data-[slot=input-group]:m-1 *:data-[slot=input-group]:mb-0 *:data-[slot=input-group]:h-9 *:data-[slot=input-group]:border-none *:data-[slot=input-group]:bg-input/30 *:data-[slot=input-group]:shadow-none data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 animate-none! relative bg-popover/70 before:pointer-events-none before:absolute before:inset-0 before:-z-1 before:rounded-[inherit] before:backdrop-blur-2xl before:backdrop-saturate-150 **:data-[slot$=-item]:focus:bg-foreground/10 **:data-[slot$=-item]:data-highlighted:bg-foreground/10 **:data-[slot$=-separator]:bg-foreground/5 **:data-[slot$=-trigger]:focus:bg-foreground/10 **:data-[slot$=-trigger]:aria-expanded:bg-foreground/10! **:data-[variant=destructive]:focus:bg-foreground/10! **:data-[variant=destructive]:text-accent-foreground! **:data-[variant=destructive]:**:text-accent-foreground!",
+            "group/combobox-content max-h-(--available-height) w-(--anchor-width) max-w-(--available-width) min-w-[calc(var(--anchor-width)+--spacing(7))] origin-(--transform-origin) overflow-hidden rounded-2xl p-1 text-popover-foreground shadow-2xl ring-1 ring-foreground/5 duration-100 data-[chips=true]:min-w-(--anchor-width) data-[side=bottom]:slide-in-from-top-2 data-[side=inline-end]:slide-in-from-left-2 data-[side=inline-start]:slide-in-from-right-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 *:data-[slot=input-group]:m-1 *:data-[slot=input-group]:mb-0 *:data-[slot=input-group]:h-9 *:data-[slot=input-group]:border-none *:data-[slot=input-group]:bg-input/30 *:data-[slot=input-group]:shadow-none data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 relative left-1/2 -translate-x-1/2 bg-popover/70 before:pointer-events-none before:absolute before:inset-0 before:-z-1 before:rounded-[inherit] before:backdrop-blur-2xl before:backdrop-saturate-150 **:data-[slot$=-item]:focus:bg-foreground/10 **:data-[slot$=-item]:data-highlighted:bg-foreground/10 **:data-[slot$=-separator]:bg-foreground/5 **:data-[slot$=-trigger]:focus:bg-foreground/10 **:data-[slot$=-trigger]:aria-expanded:bg-foreground/10! **:data-[variant=destructive]:focus:bg-foreground/10! **:data-[variant=destructive]:text-accent-foreground! **:data-[variant=destructive]:**:text-accent-foreground!",
             className,
           )}
           {...props}
@@ -226,7 +303,7 @@ function ComboboxChips({
     <ComboboxPrimitive.Chips
       data-slot="combobox-chips"
       className={cn(
-        "flex min-h-9 flex-wrap items-center gap-1.5 rounded-4xl border border-input bg-input/30 bg-clip-padding px-2.5 py-1.5 text-sm transition-colors focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50 has-aria-invalid:border-destructive has-aria-invalid:ring-[3px] has-aria-invalid:ring-destructive/20 has-data-[slot=combobox-chip]:px-1.5 dark:has-aria-invalid:border-destructive/50 dark:has-aria-invalid:ring-destructive/40",
+        "flex min-h-9 flex-wrap items-center gap-1.5 rounded-lg border border-input bg-input/50 bg-clip-padding px-2.5 py-1.5 text-sm transition-colors has-aria-invalid:border-destructive has-aria-invalid:ring-[3px] has-aria-invalid:ring-destructive/20 has-data-[slot=combobox-chip]:px-1.5 dark:has-aria-invalid:border-destructive/50 dark:has-aria-invalid:ring-destructive/40",
         className,
       )}
       {...props}
@@ -246,7 +323,7 @@ function ComboboxChip({
     <ComboboxPrimitive.Chip
       data-slot="combobox-chip"
       className={cn(
-        "flex h-[calc(--spacing(5.5))] w-fit items-center justify-center gap-1 rounded-4xl bg-muted-foreground/10 px-2 text-xs font-medium whitespace-nowrap text-foreground has-disabled:pointer-events-none has-disabled:cursor-not-allowed has-disabled:opacity-50 has-data-[slot=combobox-chip-remove]:pr-0",
+        "flex h-[calc(--spacing(5.5))] w-fit items-center justify-center gap-1 rounded-full bg-muted-foreground/10 px-2 text-xs font-medium whitespace-nowrap text-foreground has-disabled:pointer-events-none has-disabled:cursor-not-allowed has-disabled:opacity-50 has-data-[slot=combobox-chip-remove]:pr-0",
         className,
       )}
       {...props}

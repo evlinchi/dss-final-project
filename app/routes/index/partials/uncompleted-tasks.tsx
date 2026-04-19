@@ -29,8 +29,6 @@ export default function UncompletedTasks({
     uncompletedTasksSortedBy,
     setUncompletedTasksSortedBy,
     getUncompletedTasksSortByLabels,
-    uncompletedTasksPageSize,
-    setUncompletedTasksPageSize,
     paginatedUncompletedTasks,
     uncompletedTasksCurrentPage,
     setUncompletedTasksCurrentPage,
@@ -48,12 +46,13 @@ export default function UncompletedTasks({
       >
         <ComboboxInput
           placeholder="Select user"
-          size={10}
+          size={14}
           value={
             users.find((user) => user.id === filteredByUserId)?.username || ""
           }
+          labelBackgroundClassName="bg-card"
         />
-        <ComboboxContent align="center">
+        <ComboboxContent align="start">
           <ComboboxEmpty>No items found.</ComboboxEmpty>
           <ComboboxList>
             {([key, label]) => (
@@ -72,11 +71,12 @@ export default function UncompletedTasks({
         }
       >
         <ComboboxInput
-          placeholder="Sort by"
+          placeholder="Sort by title "
           value={getUncompletedTasksSortByLabels()[uncompletedTasksSortedBy]}
-          size={10}
+          size={9}
+          labelBackgroundClassName="bg-card"
         />
-        <ComboboxContent align="center">
+        <ComboboxContent align="start">
           <ComboboxEmpty>No items found.</ComboboxEmpty>
           <ComboboxList>
             {([key, label]) => (
@@ -98,8 +98,6 @@ export default function UncompletedTasks({
       tasks={paginatedUncompletedTasks}
       actionIcon={<CheckCircle2Icon className="size-4" />}
       onTaskAction={completeTask}
-      pageSize={uncompletedTasksPageSize}
-      onPageSizeChange={setUncompletedTasksPageSize}
       currentPage={uncompletedTasksCurrentPage}
       onPageChange={setUncompletedTasksCurrentPage}
       totalPages={uncompletedTasksTotalPages}

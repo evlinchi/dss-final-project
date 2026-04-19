@@ -1,12 +1,4 @@
 import {
-  Combobox,
-  ComboboxContent,
-  ComboboxEmpty,
-  ComboboxInput,
-  ComboboxItem,
-  ComboboxList,
-} from "~/components/ui/combobox";
-import {
   Pagination,
   PaginationContent,
   PaginationEllipsis,
@@ -17,6 +9,7 @@ import {
 } from "~/components/ui/pagination";
 import type { Task } from "~/interfaces/task.interface";
 import type { ReactNode } from "react";
+import { AlertCircle, Inbox } from "lucide-react";
 import TaskCard from "./task-card";
 
 interface TaskPanelCardProps {
@@ -24,8 +17,6 @@ interface TaskPanelCardProps {
   loading: boolean;
   error: string | null;
   tasks: Task[];
-  pageSize: number;
-  onPageSizeChange: (size: number) => void;
   currentPage: number;
   onPageChange: (page: number) => void;
   totalPages: number;
@@ -50,9 +41,7 @@ export default function TaskPanelCard({
   tasks,
   currentPage,
   totalPages,
-  pageSize,
   onPageChange,
-  onPageSizeChange,
   actionIcon,
   onTaskAction,
   headerControls,
@@ -132,12 +121,9 @@ export default function TaskPanelCard({
   };
 
   return (
-    <div className="relative flex-1 min-h-0 overflow-hidden rounded-2xl sm:rounded-3xl border border-border bg-secondary/95 shadow-lg sm:shadow-xl shadow-slate-950/5 p-3 sm:p-4 flex flex-col gap-3 sm:gap-4">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 border-b border-border/70 pb-3">
+    <div className="glass relative flex-1 min-h-0 overflow-hidden rounded-2xl sm:rounded-3xl shadow-[var(--shadow-md)] p-3 sm:p-4 flex flex-col gap-3 sm:gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 border-b border-border/60 pb-3">
         <div className="space-y-1">
-          <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-            Tasks
-          </p>
           <h2 className="text-lg sm:text-xl font-semibold leading-6">
             {title}
           </h2>
@@ -149,25 +135,20 @@ export default function TaskPanelCard({
         ) : null}
       </div>
 
-      <div className="relative flex-1 overflow-y-auto">
-        <div className="sticky top-0 z-10 h-4 w-full bg-linear-180 from-secondary to-transparent" />
+      <div className="relative flex-1 overflow-y-auto overflow-x-visible">
+        <div className="pointer-events-none sticky top-0 z-10 h-4 w-full bg-gradient-to-b from-[var(--card)] to-transparent" />
 
-        {loading && (
-          <div className="py-10 text-center text-sm text-muted-foreground">
-            Loading...
-          </div>
-        )}
+        {loading && <SkeletonList count={5} />}
 
         {error && (
-          <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-            {error}
+          <div className="alert-destructive rounded-xl p-4 text-sm flex items-start gap-3">
+            <AlertCircle className="size-4 mt-0.5 shrink-0" />
+            <span>{error}</span>
           </div>
         )}
 
         {!loading && !error && tasks.length === 0 && (
-          <div className="py-10 text-center text-sm text-muted-foreground">
-            {noTasksMessage}
-          </div>
+          <EmptyState message={noTasksMessage} />
         )}
 
         {!loading && !error && tasks.length > 0 && (
@@ -184,39 +165,43 @@ export default function TaskPanelCard({
           </ul>
         )}
 
-        <div className="sticky bottom-0 z-10 h-4 w-full bg-linear-180 from-transparent to-secondary pointer-events-none" />
+        <div className="pointer-events-none sticky bottom-0 z-10 h-4 w-full bg-gradient-to-t from-[var(--card)] to-transparent" />
       </div>
 
       {!loading && !error && (
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-t border-border/70 pt-3">
-          <div className="w-full sm:w-auto sm:min-w-44">
-            <Combobox
-              items={DEFAULT_PAGE_SIZES}
-              defaultValue={pageSize}
-              onValueChange={(value) => onPageSizeChange(Number(value))}
-            >
-              <ComboboxInput
-                placeholder="Per page"
-                value={`${pageSize}`}
-                size={5}
-              />
-              <ComboboxContent align="start" side="top">
-                <ComboboxEmpty>No items found.</ComboboxEmpty>
-                <ComboboxList>
-                  {([key, label]) => (
-                    <ComboboxItem key={key} value={key}>
-                      {label}
-                    </ComboboxItem>
-                  )}
-                </ComboboxList>
-              </ComboboxContent>
-            </Combobox>
-          </div>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-center gap-3 border-t border-border/60 pt-3">
           <div className="w-full sm:w-auto overflow-x-auto">
             {renderPagination()}
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function SkeletonList({ count }: { count: number }) {
+  return (
+    <ul className="space-y-2 sm:space-y-3" aria-label="Loading tasks" aria-busy>
+      {Array.from({ length: count }).map((_, i) => (
+        <li
+          key={i}
+          className="h-14 sm:h-16 rounded-xl sm:rounded-2xl border border-border/50 bg-muted/40 animate-pulse"
+        />
+      ))}
+    </ul>
+  );
+}
+
+function EmptyState({ message }: { message: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center gap-3 py-12 text-center">
+      <div className="grid size-12 place-items-center rounded-full bg-muted text-muted-foreground">
+        <Inbox className="size-5" />
+      </div>
+      <div className="space-y-1">
+        <p className="text-sm font-medium text-foreground">All clear</p>
+        <p className="text-xs text-muted-foreground max-w-xs">{message}</p>
+      </div>
     </div>
   );
 }
